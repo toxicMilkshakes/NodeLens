@@ -1,0 +1,7 @@
+/work/
+/outputs/
+/bin/
+*.log
+*.user
+.env
+.env.*
