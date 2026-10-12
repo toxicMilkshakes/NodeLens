@@ -26,6 +26,24 @@ namespace NodeLens {
         public static Dictionary<string, object> Obj(Dictionary<string, object> o, string key) { object v; return o != null && o.TryGetValue(key, out v) ? v as Dictionary<string, object> : null; }
         public static double? Number(Dictionary<string, object> o, string key) { double v; return double.TryParse(Text(o, key), NumberStyles.Float, CultureInfo.InvariantCulture, out v) && !double.IsNaN(v) && !double.IsInfinity(v) && v >= 0 ? (double?)v : null; }
     }
+    public static class StartupRegistration {
+        const string RunKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
+        public static string Command(string executable) { return "\"" + Path.GetFullPath(executable) + "\" --silent"; }
+        public static bool IsEnabled() {
+            using (var key = Registry.CurrentUser.OpenSubKey(RunKey)) {
+                return key != null && !string.IsNullOrWhiteSpace(key.GetValue("NodeLens") as string);
+            }
+        }
+        public static void SetEnabled(bool enabled) {
+            using (var key = Registry.CurrentUser.CreateSubKey(RunKey)) {
+                Write(key, enabled, System.Reflection.Assembly.GetExecutingAssembly().Location);
+            }
+        }
+        public static void Write(RegistryKey key, bool enabled, string executable) {
+            if (enabled) key.SetValue("NodeLens", Command(executable), RegistryValueKind.String);
+            else key.DeleteValue("NodeLens", false);
+        }
+    }
     public sealed class Settings {
         public string Source { get; set; }
         public string Endpoint { get; set; }

@@ -23,6 +23,22 @@ class Tests {
     static string Http(string body,bool chunked) {return "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n"+(chunked?"Transfer-Encoding: chunked":"Content-Length: "+Encoding.UTF8.GetByteCount(body))+"\r\nConnection: close\r\n\r\n"+(chunked?Encoding.UTF8.GetByteCount(body).ToString("x")+"\r\n"+body+"\r\n0\r\n\r\n":body);}
     static void Write(Stream stream,string value){byte[] b=Encoding.UTF8.GetBytes(value);stream.Write(b,0,b.Length);stream.Flush();}
     static int Main(string[] args) {
+        Test("Startup registration quotes paths and can be removed independently",()=>{
+            string path=@"Software\NodeLens.Tests\"+Guid.NewGuid().ToString("N");
+            try {
+                using(var key=Microsoft.Win32.Registry.CurrentUser.CreateSubKey(path)) {
+                    key.SetValue("OtherApp","preserve");
+                    string executable=Path.Combine(Path.GetTempPath(),"中文 folder","NodeLens.exe");
+                    StartupRegistration.Write(key,true,executable);
+                    Equal(key.GetValue("NodeLens"),"\""+Path.GetFullPath(executable)+"\" --silent");
+                    StartupRegistration.Write(key,true,executable);
+                    StartupRegistration.Write(key,false,executable);
+                    Equal(key.GetValue("NodeLens"),null);
+                    Equal(key.GetValue("OtherApp"),"preserve");
+                    StartupRegistration.Write(key,false,executable);
+                }
+            } finally { Microsoft.Win32.Registry.CurrentUser.DeleteSubKeyTree(path,false); }
+        });
         Test("Nested groups resolve to leaf node",()=>{var s=Routing.Select(Proxies(),"","rule");Equal(s.Name,"HK-09");Equal(s.Group,"节点选择");Assert(s.CanProbe);});
         Test("Named provider selector precedes fallback group",()=>{var p=Json.Parse("{\"故障转移\":{\"type\":\"Fallback\",\"all\":[],\"now\":\"剩余流量\"},\"良心云\":{\"type\":\"Selector\",\"all\":[],\"now\":\"SG01\"},\"SG01\":{\"type\":\"Trojan\"}}");Equal(Routing.Select(p,"","rule").Name,"SG01");});
         Test("Global mode follows GLOBAL",()=>Equal(Routing.Select(Proxies(),"","global").Name,"DIRECT"));

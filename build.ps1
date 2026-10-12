@@ -1,7 +1,8 @@
-﻿$ErrorActionPreference = 'Stop'
+﻿param([string]$OutputDirectory = 'bin')
+$ErrorActionPreference = 'Stop'
 $taskFramework = Join-Path $env:WINDIR 'Microsoft\NET\Framework64\v4.0.30319'
 $taskFramework = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319'
-$taskOut = Join-Path $PSScriptRoot 'bin'
+$taskOut = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot $OutputDirectory))
 New-Item -ItemType Directory -Path $taskOut -Force | Out-Null
 $taskRefs = @('System.dll','System.Core.dll','System.Drawing.dll','System.Web.Extensions.dll','System.Security.dll','System.Windows.Forms.dll','System.Xaml.dll') | ForEach-Object { '/r:' + (Join-Path $taskFramework $_) }
 $taskRefs += @('PresentationFramework.dll','PresentationCore.dll','WindowsBase.dll') | ForEach-Object { '/r:' + (Join-Path "$taskFramework\WPF" $_) }

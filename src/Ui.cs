@@ -204,8 +204,13 @@ namespace NodeLens {
             var file=new TextBox { Text=settings.ConfigPath,Padding=new Thickness(7) }; var browse=new Button { Content="选择",Padding=new Thickness(10,5,10,5),Margin=new Thickness(7,0,0,0) }; Grid.SetColumn(browse,1); fileGrid.Children.Add(file);fileGrid.Children.Add(browse);stack.Children.Add(fileGrid);
             browse.Click+=(s,e)=>{var picker=new Microsoft.Win32.OpenFileDialog {Filter="配置文件|*.yaml;*.yml;*.json|所有文件|*.*"};if(picker.ShowDialog()==true)file.Text=picker.FileName;};
             var probe=new CheckBox { Content="每 30 秒探测一次 HTTP 延时",IsChecked=settings.ProbeEnabled,Margin=new Thickness(0,17,0,8),Foreground=Brushes.White };stack.Children.Add(probe);
+            var startup=new CheckBox { Content="开机自启动（登录后显示在任务栏）",Margin=new Thickness(0,4,0,8),Foreground=Brushes.White };stack.Children.Add(startup);
+            string startupError=null;
+            try { startup.IsChecked=StartupRegistration.IsEnabled(); }
+            catch(Exception ex) { startup.IsEnabled=false;startupError="无法读取自启动设置："+ex.Message; }
+            stack.Children.Add(new TextBlock { Text="勾选后点击保存生效；请将程序保留在固定目录。",FontSize=11,Foreground=Brushes.LightGray,TextWrapping=TextWrapping.Wrap,Margin=new Thickness(0,0,0,8) });
             var note=new TextBlock { Text="Clash / 肥猫云：通过本地接口读取节点和速率。\n接口接通后，可关闭主窗口并保持后台连接。\nNordVPN：专用网卡速率，节点名称尚未支持。\n插件不再截图或识别客户端窗口。\n延时使用 Cloudflare / Google 的 204 页面；\n具体目标可悬停查看，不做带宽测速。",TextWrapping=TextWrapping.Wrap,FontSize=11,Foreground=Brushes.LightGray,LineHeight=20,Margin=new Thickness(0,3,0,15) };stack.Children.Add(note);
-            var error=new TextBlock { TextWrapping=TextWrapping.Wrap,Foreground=Brushes.LightSalmon,Margin=new Thickness(0,0,0,10) };stack.Children.Add(error);
+            var error=new TextBlock { Text=startupError,TextWrapping=TextWrapping.Wrap,Foreground=Brushes.LightSalmon,Margin=new Thickness(0,0,0,10) };stack.Children.Add(error);
             var buttons=new StackPanel {Orientation=Orientation.Horizontal,HorizontalAlignment=HorizontalAlignment.Right};stack.Children.Add(buttons);
             var cancel=new Button {Content="取消",IsCancel=true,Padding=new Thickness(20,8,20,8),Margin=new Thickness(0,0,8,0)};buttons.Children.Add(cancel);
             var save=new Button {Content="保存并重连",IsDefault=true,Padding=new Thickness(20,8,20,8)};buttons.Children.Add(save);
@@ -215,6 +220,10 @@ namespace NodeLens {
                     if(file.Text.Trim().Length>0 && !File.Exists(file.Text.Trim()))throw new ArgumentException("配置文件不存在");
                     if(source.SelectedIndex<0)throw new ArgumentException("请选择数据来源");
                     if(secret.Password.IndexOfAny(new[]{'\r','\n'})>=0)throw new ArgumentException("接口密钥不能包含换行");
+                    if(startup.IsEnabled) {
+                        try { StartupRegistration.SetEnabled(startup.IsChecked==true); }
+                        catch(Exception ex) { throw new InvalidOperationException("无法保存自启动设置："+ex.Message,ex); }
+                    }
                     settings.Source=new[]{"auto","clash","fatcat","nord"}[source.SelectedIndex];settings.Endpoint=endpoint;settings.Secret=secret.Password;settings.ConfigPath=file.Text.Trim();settings.Group=group.Text.Trim();settings.ProbeEnabled=probe.IsChecked==true;
                     DialogResult=true;
                 } catch(Exception ex) {error.Text=ex.Message;}
