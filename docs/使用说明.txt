@@ -1,0 +1,32 @@
+NodeLens Windows 便携版
+
+运行要求：Windows 10/11 64 位，.NET Framework 4.8 或更高版本。
+无需安装开发工具，也无需自己编译。
+
+1. 将 ZIP 内所有文件完整解压到固定文件夹。
+2. 启动 Clash Verge 并连接代理，保持代理内核运行；主窗口可以关闭或隐藏。
+3. 双击 NodeLens.exe。
+4. 右键显示小窗，可打开设置、切换到任务栏或退出程序。
+
+NodeLens.exe.config 必须和 NodeLens.exe 保持在同一文件夹。
+程序没有托盘图标。任务栏模式下，右键节点和网速文字操作。
+如果显示“—”，在设置中选择 Clash Verge，并检查代理内核是否正在运行。
+如自动发现失败，可填写客户端实际启用的本地控制地址和密钥；只填写 127.0.0.1:9090 并不会自动开启客户端接口。
+
+开机自启动（可选）：
+在程序设置中勾选“开机自启动（登录后显示在任务栏）”，点击“保存并重连”。
+关闭开关并保存即可取消。无需管理员权限。
+移动程序文件夹后，请重新启用并保存以更新启动路径。
+如果以前手动在 shell:startup 中放过快捷方式，请自行删除旧快捷方式。
+
+支持范围：
+Clash Verge：节点、HTTP 延时、上下行速度。
+肥猫云 Lite：需启用本地 Clash 接口，尚未完成真实后台兼容验证。
+NordVPN：专用网卡速率和 HTTP 探测；不支持节点名称。
+任务栏模式仅适配主屏横向任务栏，Windows 更新可能影响兼容性。
+
+个人配置保存在 %LOCALAPPDATA%\NodeLens\settings.json。
+本压缩包不包含个人配置、代理订阅或接口密钥。
+
+项目及更新：https://github.com/toxicMilkshakes/NodeLens
+成品下载：https://github.com/toxicMilkshakes/NodeLens/releases/latest

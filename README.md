@@ -2,6 +2,14 @@
 
 Windows 桌面与任务栏 VPN 状态小窗，显示节点、HTTP 延时和实时上下行速度。
 
+## 下载即用
+
+前往 [最新版本 Releases](https://github.com/toxicMilkshakes/NodeLens/releases/latest)，下载 **NodeLens-1.0.0-Windows-x64.zip**，完整解压后双击 **NodeLens.exe**。需要 Windows 10/11 x64 和 .NET Framework 4.8，无需编译。
+
+请保留同目录的 `NodeLens.exe.config`，具体操作见包内“使用说明.txt”。Clash Verge 的代理内核需要保持运行。
+
+GitHub 的 **Code → Download ZIP** 和 Release 下的 **Source code** 均为源码包；直接运行请下载上面命名的 Windows 成品包。
+
 ## 功能
 
 - Clash Verge：自动发现运行中的 Mihomo 管道，也支持本机 HTTP 接口。
@@ -36,6 +44,8 @@ Windows 桌面与任务栏 VPN 状态小窗，显示节点、HTTP 延时和实�
 配置保存在 `%LOCALAPPDATA%\NodeLens\settings.json`。缺失数据显示为“—”，不会冒充零速率或旧数据。
 
 ## 测试
+
+维护者运行 `./package.ps1` 可重新构建、执行测试，并在 `outputs/releases` 生成成品 ZIP 和 SHA256 校验文件。
 
 30 项检查覆盖自启动注册与移除、节点解析、接口认证、命名管道、流量流、断线清空和活动服务管道发现。测试使用本地模拟服务，不切换 VPN 节点或修改订阅。
 
